@@ -133,15 +133,16 @@
 
     const material = new THREE.PointsMaterial({ 
       color: 0x00f3ff, 
-      size: 0.02, 
+      size: 0.12,
+      emissive: 0x002244, 
       transparent: true, 
-      opacity: 0.8 
+      opacity: 1, 
     });
 
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    camera.position.z = 5;
+    camera.position.z = 2.5;
 
     const sigma = 10, rho = 28, beta = 8/3; // Lorenz params
     function animate() {
@@ -169,7 +170,7 @@
       }
       
       points.geometry.attributes.position.needsUpdate = true;
-      points.rotation.y += 0.001;
+      points.rotation.y += 0.003;
       
       renderer.render(scene, camera);
     }
