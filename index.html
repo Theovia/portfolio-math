@@ -1,0 +1,185 @@
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;Theovia Portfolio - Math Edition&lt;/title&gt;
+  &lt;script src=&quot;https://unpkg.com/three@0.167.1/build/three.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://unpkg.com/three@0.167.1/examples/js/controls/OrbitControls.js&quot;&gt;&lt;/script&gt;
+  &lt;style&gt;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: #050505; 
+      color: white; 
+      font-family: 'JetBrains Mono', monospace; 
+      overflow-x: hidden; 
+    }
+    canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+    .glass { 
+      background: rgba(255,255,255,0.03); 
+      backdrop-filter: blur(12px); 
+      border: 1px solid rgba(255,255,255,0.08); 
+      border-radius: 12px; 
+    }
+    .hero { 
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      padding: 2rem; 
+    }
+    .headline { 
+      font-size: clamp(3rem, 10vw, 8rem); 
+      font-weight: 800; 
+      letter-spacing: -0.03em; 
+      text-shadow: 0 0 20px #00f3ff; 
+      margin-bottom: 1rem; 
+    }
+    .subheadline { font-size: 1.5rem; color: #a1a1aa; margin-bottom: 2rem; }
+    .cta { 
+      padding: 1rem 2rem; 
+      background: rgba(0,243,255,0.2); 
+      border: 1px solid #00f3ff; 
+      border-radius: 8px; 
+      color: #00f3ff; 
+      font-weight: 600; 
+      text-decoration: none; 
+      transition: all 0.3s ease; 
+    }
+    .cta:hover { 
+      background: #00f3ff; 
+      color: #050505; 
+      box-shadow: 0 0 30px rgba(0,243,255,0.5); 
+    }
+    .section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .bento { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+      gap: 1.5rem; 
+    }
+    .card { 
+      padding: 2rem; 
+      height: 200px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+    }
+    .card-hero { grid-column: span 2; grid-row: span 2; height: 400px; }
+    @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    .scanlines::before { 
+      content: ''; 
+      position: fixed; 
+      inset: 0; 
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, transparent 1px); 
+      pointer-events: none; 
+      z-index: 9999; 
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;scanlines&quot;&gt;
+  &lt;div id=&quot;hero&quot; class=&quot;hero&quot;&gt;
+    &lt;h1 class=&quot;headline&quot;&gt;Theovia&lt;/h1&gt;
+    &lt;p class=&quot;subheadline&quot;&gt;Mathematical Frontiers in AI &amp; Viz&lt;/p&gt;
+    &lt;a href=&quot;#projects&quot; class=&quot;cta&quot;&gt;Explore Works&lt;/a&gt;
+  &lt;/div&gt;
+  
+  &lt;section id=&quot;projects&quot; class=&quot;section&quot;&gt;
+    &lt;h2 style=&quot;text-align: center; margin-bottom: 3rem; font-size: 3rem;&quot;&gt;Projects&lt;/h2&gt;
+    &lt;div class=&quot;bento&quot;&gt;
+      &lt;div class=&quot;glass card-hero&quot;&gt;
+        &lt;h3 style=&quot;font-size: 2rem; margin-bottom: 1rem;&quot;&gt;v7-Clinical&lt;/h3&gt;
+        &lt;p&gt;3D fluorescence cell viz with Three.js. Mathematical modeling of biological data.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;glass card&quot;&gt;
+        &lt;h3&gt;Bills Dashboard&lt;/h3&gt;
+        &lt;p&gt;Smart home energy tracking. Live deploy.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;glass card&quot;&gt;
+        &lt;h3&gt;IPSE ERP Migration&lt;/h3&gt;
+        &lt;p&gt;$736k project: Odoo + chatbot.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;glass card&quot;&gt;
+        &lt;h3&gt;Context Hub Skill&lt;/h3&gt;
+        &lt;p&gt;API docs for agents.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;script&gt;
+    // Mathematical Particle Attractor (Lorenz-like)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const particles = 5000;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particles * 3);
+    const velocities = new Float32Array(particles * 3);
+
+    for (let i = 0; i &lt; particles; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      velocities[i * 3] = 0;
+      velocities[i * 3 + 1] = 0;
+      velocities[i * 3 + 2] = 0;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({ 
+      color: 0x00f3ff, 
+      size: 0.02, 
+      transparent: true, 
+      opacity: 0.8 
+    });
+
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    camera.position.z = 5;
+
+    const sigma = 10, rho = 28, beta = 8/3; // Lorenz params
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const pos = points.geometry.attributes.position.array;
+      
+      for (let i = 0; i &lt; particles; i++) {
+        const i3 = i * 3;
+        const x = pos[i3], y = pos[i3+1], z = pos[i3+2];
+        
+        // Simplified Lorenz attractor math
+        const dx = sigma * (y - x) * 0.01;
+        const dy = (x * (rho - z) - y) * 0.01;
+        const dz = (x * y - beta * z) * 0.01;
+        
+        pos[i3] += dx;
+        pos[i3+1] += dy;
+        pos[i3+2] += dz;
+        
+        // Bounds
+        if (Math.abs(pos[i3]) &gt; 30) pos[i3] *= -0.9;
+        if (Math.abs(pos[i3+1]) &gt; 30) pos[i3+1] *= -0.9;
+        if (Math.abs(pos[i3+2]) &gt; 30) pos[i3+2] *= -0.9;
+      }
+      
+      points.geometry.attributes.position.needsUpdate = true;
+      points.rotation.y += 0.001;
+      
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
